@@ -1,0 +1,23 @@
+---
+title: "Day 3 Homework"
+output: html_document
+---
+
+1. Identify a numeric column in your data. Find the 95th %ile value of that column.
+
+```{r}
+
+```
+
+2. Subset your data to be only include values greater than that extreme 95th %ile
+
+```{r}
+
+```
+
+3. Now find the lowest 5th %ile, and subset to the data that includes both the lower extremes and upper extremes
+
+```{r}
+
+```
+

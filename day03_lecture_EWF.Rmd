@@ -95,7 +95,7 @@ Package for other stats packages (SPSS, SAS, Stata):
 ```{r eval=FALSE}
 ?read.table
 
-mydata <- read.csv(filename, na.strings = c("NA", "N/A", "n/a", " ", "nuthin"))
+mydata <- read.csv(filename, na.strings = c("NA", "N/A", "n/a", " ", "nuthin")) #na.strings part of code tells R which data are missing
 
 ?readLines
 ?scan
@@ -104,11 +104,11 @@ mydata <- read.csv(filename, na.strings = c("NA", "N/A", "n/a", " ", "nuthin"))
 ## Writing files
 
 ```{r eval=FALSE}
-?write.table # .csv, etc.
+?write.table # .csv, etc. #This is how you'd save your final product (like if you made a new excel, you'd write it wo changing the original excel you started with)
 ```
 
 Gotcha:
-  - rownames!
+  - rownames! #Don't forget to make row.names = FALSE (it's default to true but that would add rownames and shift your column headers to be off by one)
   
 ```{r eval=FALSE}
 write.table(mydata, file = "outputfile.txt", 
@@ -137,19 +137,42 @@ write.csv(mydata, file = "outputfile.csv", row.names = FALSE) # good for writing
 A few handy things with numbers:
 
 ```{r}
-# floating point pitfalls
+# floating point pitfalls (computers can only store so much detail about a number.. ex: pi will cut off somewhere!)
+x <- 0.1 + 0.2
+x
+x == 0.3 #(== is x equal to 0.3.... R returns FALSE...it clearly ==.3 but the computer is probably thinking of it as 0.3000000...)
 
 # "e" notation for really big numbers
 1e4
 
 # round(), floor(), ceiling()
+x2 <- round(x,1)
+x2 == 0.3 #now that we've specificed to round to 1 decimal, R is returning TRUE)
+
 
 # sample(), rnorm(), rbinom()
+sample(10)
+?sample
+sample(1:10, size = 4, replace = FALSE) #even though replace = FALSE is the default (which we can see in the help menu after typing ?sample) it's helpful to be explicit to ensure you're doing what you want.
 
-# the r/p/d families
+rnorm(10)
+
+rbinom(5, size = 10, prob = .2) #like flipping 10 coins 5 times and probability of success (1)
+
+many.flips <- rbinom(1e6, size = 10, prob = .2)
+mean(many.flips)
+
+# the r/p/d/q families
+?rnorm
+?pnorm
+?dnorm
+
+pnorm(1.96)
 
 # quantile()
-
+x <- rnorm(1e5, mean = 2, sd = 5)
+quantile (x) #will give you quartiles
+quantile(x, seq(0, 1, .1)) #allows to see starting with 0 going up by 1 in 10% increemnts)
 ```
 
 
@@ -171,16 +194,62 @@ A few handy things with numbers:
     
 ```{r}
 # basic forms
+1>2 #logicals return TRUE OR FALSE values
+1<2
+
+class(1) #class will tell you what something is, which is helpful to do if data isn't acting how youd expect
+class(TRUE)
+class (1<2)
+class('1')
+
+1==2 #(== is for comparison purposes; like asking is 1 equal to 2?)
+
+s <- "a string" 
+s == "a string" #the == works for strings, too! but is still limited
+
+s != "a string" #!= means 'not equal to""
+
+f <- 1:5 #sets f to be 1, 2, 3, 4, 5
+f <= 3 #will return whether each digit within f is <= 3
+
+TRUE & TRUE #if things on both sides of & are true it'll return true
+TRUE & FALSE #if things on either side of & are false it'll return false
+TRUE | TRUE #the opposite logic applies for OR statements
+TRUE | FALSE
+
+g <- 1:6
+g < 3
+g > 4
+(g > 2) & (g < 5) #parens are optional but can be helpful to organize your thoughts
+! (g > 4 | g < 3) #gets same thing by using NOT and OR (rather than AND as in line above)
+
 
 # "shortcut" forms (avoid!)
+F
+T
+#T or F will return TRUE or FALSE. DON"T DO THIS!! You can never use FALSE or TRUE for a variable name so you can't overwrite them but you could overwrite T or F.
 
 # examples of comparisons
 
 # which()
+x < 5
+set.seed(42)
+x <- sample (1:10, 100, replace = TRUE)
+x == 7
+which(x == 7)
 
 # logicals for subsetting
 
 # %in%
+all.values <- c("a", "b", "c", "d")
+x <- sample(all.values, 100, TRUE)
+
+x == c("a", "b") #THIS WILL DO SOMETHING BUT NOT WHAT YOU WANT IF YOU WANT TO RETURN ALL As and Bs.
+x %in% c("a", "b") #THIS is usually waht you want bc it sees if any values in x are "a" or "b"
+
+x1 <- c(1, 2, 7, 32)
+x2 <- c(1, 5, 8, 32)
+x1 == x2 #This would compare if the first character in x1 = first character in x2, if second in x2 is second in x2
 
 ```
 
