@@ -6,18 +6,45 @@ output: html_document
 1. Identify a numeric column in your data. Find the 95th %ile value of that column.
 
 ```{r}
+#Background work to pullin libs, set working directory and pull in dataset.
+library(pillar)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+
+setwd("M:/IRPA/Personal/Staff/efoley/Courses/BSOS798 R Programming/Homework")
+
+Dataset <- read.csv("BSOS798Dataset.csv", stringsAsFactors = FALSE)
+
+#This wouldn't really make sense to do but I'm finding the 95th %ile of SurvID_1 since the rest of the numbers are survey data and only from 0-4.
+
+class(Dataset$SurvID_1) #clariying this row is numeric.
+?quantile #remember this command from class but need a refresher on how to use it
+quantile(Dataset$SurvID_1, .95) #shows 95th percintile is 3698
 
 ```
 
 2. Subset your data to be only include values greater than that extreme 95th %ile
 
 ```{r}
+SurveyID.95 <- quantile(Dataset$SurvID_1, .95)
+SurveyID.95
+dataset_extreme <- Dataset[Dataset$SurvID_1 > SurveyID.95, ]
 
+nrow(Dataset) #check number of rows in original dataset
+nrow(dataset_extreme) #check number of rows in subset
+nrow(dataset_extreme)/nrow(Dataset) #check subset is 5% of original dataset rows
 ```
 
 3. Now find the lowest 5th %ile, and subset to the data that includes both the lower extremes and upper extremes
 
 ```{r}
+SurveyID.05 <- quantile(Dataset$SurvID_1, .05)
+SurveyID.05
+dataset_both_extremes <- Dataset [Dataset$SurvID_1 > SurveyID.95 | Dataset$SurvID_1 < SurveyID.05, ]
 
+nrow(Dataset)
+nrow(dataset_both_extremes)
+nrow(dataset_both_extremes)/nrow(Dataset)
 ```
 

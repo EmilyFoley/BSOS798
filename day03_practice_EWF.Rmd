@@ -1,7 +1,7 @@
 ---
 title: "Day 3 Practice"
 output: html_document
----
+---iris
 
 0. Make a "copy" of the `iris` data set in your workspace.
 
@@ -17,6 +17,7 @@ summary(myiris$Sepal.Length) #All are greater than or equal to 3.3
 #sl_greater_than_3 <- data.frame(myiris, myiris$Sepal.Length>=3.3)
 #summary(sl_greater_than_3$Sepal.Length)
 
+#try again with Petal Length
 summary(myiris)
 myiris.sub1 <- myiris[myiris$Petal.Length >= 3.3, ]
 summary(myiris.sub1)
@@ -38,7 +39,12 @@ pw_less_than_median %in% c("TRUE")
 summary(pw_less_than_median$Petal.Width)
 
 ##STILL WORKING
+petal_width_median <- median(myiris$Petal.Width) #median petal length is 1.3
+petal_width_median
 
+myiris.sub2 <- myiris[myiris$Petal.Width <= petal_width_median, ] #You have it here but usually forget.... remember the comma at the end to signify you want all columns!!!!
+
+summary(myiris.sub2) #you can see petal.width in this subset is max 1.3 so everything is below the original median of petal.width in myiris
 
 
 ```
