@@ -1,0 +1,109 @@
+---
+title: "Day 4 Homework"
+output: html_document
+---
+0. Prep work
+```{r}
+#Background work to pullin libs, set working directory and pull in dataset.
+library(pillar)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+
+setwd("M:/IRPA/Personal/Staff/efoley/Courses/BSOS798 R Programming/Homework")
+
+dataset <- read.csv("BSOS798Dataset.csv")
+
+```
+
+
+1. Identify a column in your data that *should* be a factor (whether it is or not). Check to see whether R is already treating it as a factor, and if not, convert it into a factor.
+
+```{r}
+summary(dataset)
+class(dataset$gender)
+#gender is a factor
+
+```
+
+2. What are the levels of the factor? How many occurrences of each level are there in the data? Are the levels ordered in a sensible/meaningful way?
+   
+```{r}
+levels(dataset$gender) #levels of the factor are female and male
+summary(dataset$gender) #female = 1456 and male = 1384
+#levels are ordered in a meaningful way
+```
+
+
+3. Create a new column that is a numeric "version" of the factor column, using `as.numeric()`. Use `xtabs()` to see how the values of these columns line up.
+
+```{r}
+?as.numeric
+dataset$gender_numeric <- as.numeric(dataset$gender)
+colnames(dataset) #checking code worked
+summary(dataset$gender_numeric) #checking code worked
+class(dataset$gender_numeric) #checking code worked
+
+xtabs(~ dataset$gender + dataset$gender_numeric) #it worked!
+xtabs(~ gender + gender_numeric, data = dataset) #same code as above just written differently
+```
+
+
+4. Create another column that is a copy of the factor column. Now, recode this new column so that the factor levels have new names. Use `xtabs()` or another function to double-check your coding.
+  (e.g., if you have a factor with levels "A" and "B", you could make a new column that had "condition A" and "condition B" as the level names instead)
+
+```{r}
+dataset$gender_new <- as.factor(dataset$gender) #creating another column that is a copy of the factor column
+colnames(dataset) #checking code worked
+summary(dataset$gender_new) #checking code worked
+class(dataset$gender_new) #checking code worked
+
+levels(dataset$gender_new) <-c("women", "men")
+
+summary(dataset$gender_new)
+summary(dataset$gender)
+xtabs (~ gender_new + gender, data = dataset)
+
+```
+
+
+5. Change the order of the levels in your new factor, using three different methods:
+  a. `relevel()`
+  b. `reorder()`
+  c. `factor()`
+
+```{r}
+?relevel
+
+```
+
+
+6. Missing values
+  a. Do you have any missing values (NA) in your data?
+  b. Are there any places where you *should* have missing values but they were read into R as some other value?
+  c. If the answer to (b) is "yes", figure out how to read in your data in a way that correctly identifies the missing value "code"
+  d. If you have any NAs in your data, describe why you think those values are missing. Does there appear to be any systematic relationship between missingness and other variables in your data?
+
+```{r}
+
+
+```
+
+
+7. Find some aspect of your data that needs to be combined or merged in some way.  This could be a variety of things:
+  - multiple "sheets" in an Excel
+  - multiple files that should be combined into one data set
+  - properties that need to be merged in to one data set. For example:
+    - you have a table of subject properties (gender, handedness, etc.) that need to be merged into the item-level data
+    - you have other information on countries (population, etc.) that need to be merged in
+  - if you DON'T have this naturally-occurring issue, figure out a way to manufacture it. For example:
+    - split up your data into chunks
+    - make up some new table of information that you want to merge in
+  - Explain (in words) what you are trying to do
+  - Use binding/merging commands to accomplish this
+  - Complete at least ONE example of binding and ONE example of merging
+
+```{r}
+
+
+```

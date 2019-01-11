@@ -22,6 +22,11 @@ summary(myiris)
 myiris.sub1 <- myiris[myiris$Petal.Length >= 3.3, ]
 summary(myiris.sub1)
 
+#a way to check that this worked is to run this part: 
+myiris$Petal.Length >= 3.3
+
+
+#Make a new dataset from myiris that i want to subset so use brackets and I want it to focus on the column petal length and only bring back things bigger than/equal to 3.3 and I want all rows that fit that condition so I put the comma at the end.
 
 ```
 

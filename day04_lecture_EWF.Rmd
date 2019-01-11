@@ -1,0 +1,344 @@
+---
+title: "Day 4 Lecture"
+output: html_document
+---
+
+# Today's agenda
+
+  - Review & questions
+  - Character/string data
+  - Factors
+  - Excursion: simple data frame manipulation, `xtabs()`
+  - PRACTICE: working with factors, part 1
+  - Special values: NA/NULL/Inf/NaN
+  - PRACTICE: data type coersion
+  - Lists
+  - Creating data frames from scratch
+  - Combining data frames
+  - PRACTICE: binding & merging
+
+# Review
+  - Go over Day 3 Practice
+  - Day 3 Homework example
+  - Knitting notes
+
+# Characters
+  - more primitive than factors
+  - can manipulate with regular expressions, other text functions
+
+Some handy text stuff
+
+```{r}
+# quotes
+x <- "a string" #scott tends to use double quotes bc r uses double quotes when it shows you what it did in the console
+x
+y <- 'also a string'
+y
+z <- "this is a 'string' also"
+z
+
+# cat(), print() 
+print(x) #shows x as a vector with [1] and quotes... gets you what you need but doesn't look as clean as cat(x)
+cat(x) #just prints string without quotes so it looks like normal text
+
+
+#print is acutally always happening behind the scenes when you just type
+2+2 #same as print(2+2)
+cat(2+2) #would get rid of [1] in console
+
+# special characters: \t, \n, "escaping"
+
+x <- "here's a cool result: 10"
+cat(x)
+
+y <- "here's a cool result:\t10"
+cat(y)
+
+z <- "here's a cool result:\n\n\t\t\t10"
+cat(z)
+
+#\t for tab
+#\n for line returns
+cat("some\ntext")
+cat("some\\ntext") #extra \ tells R to treat \ as \ rather than sepcial character
+
+
+# nchar() (#length refers to a vector so if you say length of hello it's return 1 if you want the length of a string use nchar and it'd return 5)
+nchar("hello")
+length("hello")
+
+# paste(), strsplit()
+paste ("hello", "there")
+?paste #paste defaults to a space separator
+paste ("hello", "there", sep = "") #this would get rid of the space sperator
+
+x<- c("here", "are", "some", "strings")
+x
+
+paste("prefix", x) #this would put "prefix" in front of every instance of x
+
+paste(x, collapse = " ") #collapses everything into one string separated by a space
+
+x
+y <- paste (x, "suffix", sep = "_")
+y
+
+strsplit(y, split = "_") #good to use when there's an easy to see delimiter like - but if there isn't an easy delimiter use gsub and figure out the pattern
+
+z <- paste(x, "suffix", sep = ".")
+z
+
+strsplit(z, split = ".") #WONT WORK BC . MEANS EVERY CHACARACTER
+strsplit(z, split = "\\.") #use the \\ to tell R you want to use the . as a delimiter
+
+
+# stringr package #use this if you do a lot of data manipulation with text / collapsing
+
+# grep(), grepl(), gsub()
+x
+grep("here", x) #here is pattern and x is vector and grep returns where in the string 
+grep("e", x)
+
+
+grepl("here", x) #grepl is the logical version of grep and will return TRUE or FALSE
+
+###basic gsub
+gsub("e", "E", x) #search and replace runction, give what you're looking for what to replace and the vector to look in
+gsub ("e", "", x)
+
+###fancy gsub
+longer.thing <- c("10F5657", "59J4957", "30K16238")
+gsub("\\d+\\w(\\d+)", "\\1", longer.thing) #d means digit and #w means word; this will just get digits
+gsub("(\\d+)(\\w)(\\d+)", "\\2", longer.thing) #this will jsut get letters (the \\2 refers to the second set of parehtneticals so it'll replace the whole thing with what's in the second set of parehtniesis which is a w aka letters)
+
+longer.thing2 <- c("10F5657ggjggjjg", "59J4957sfs", "30K16238eeeee")
+gsub("(\\d+)(\\w)(\\d+)", "\\2", longer.thing2)
+
+
+```
+
+# Factors
+  - Actually numbers under the hood
+  - Act like numbers + labels
+  - VERY useful for many kinds of analyses
+  - if a column is a *property* of data (not a measure itself), factors are usually best
+    - groupings = good as factors
+    - conditions = good as factors
+  - if a column is *data*, maybe consider keeping it a string
+    - free response answers = bad as factors
+  - `as.factor()` coerces to a factor
+  - `factor()` creates a factor
+  - factors have *levels*: categories
+  - `stringsAsFactors` : option for how to read in character vectors
+    - = FALSE if you don't want to read in characters as factors
+
+```{r}
+# factor() #this is the way to make a factor
+x <- c(rep("a", 20), rep("b", 20), rep("c", 20)) #making a vector with A 20 times, B 20 time, c 20 times
+x
+summary(x) #shows list
+
+x.factor <- factor(x)
+summary (x.factor) #shows count of each A B and C
+
+
+# levels()
+levels(x.factor)
+
+
+# summary()
+
+# coersion
+
+# subsetting
+sleep
+mysleep <- sleep
+summary(mysleep) #extra is numbers group is factor you can tell based on the output
+
+class(mysleep$group) #tells you what kind of data it is
+
+levels(mysleep$group)
+
+mysleep.group1 <- (mysleep [mysleep$group=="1",])
+summary(mysleep.group1)
+
+# droplevels
+mysleep.group1 <- droplevels(mysleep.group1) #drop levels gets rid of factors that have no observations (in this case, group 2)
+mysleep.group1
+
+
+# changing levels (labels)
+mysleep <- sleep
+levels(mysleep$group)
+levels(mysleep$group) <- c("pre", "post")
+levels(mysleep$group)
+summary(mysleep)
+head(mysleep)
+
+colnames(mysleep)
+colnames(mysleep) <- c("extra sleep", "treatment group", "subject")
+head(mysleep)
+
+
+# re-ordering
+mysleep <- sleep
+levels(mysleep$group) <- c("pre", "post")
+summary(mysleep)
+#levels(mysleep$group) <- c("post", "post") #WRong. CHANGES DATA, NOT ORDER OF LEVELS
+#levels(mysleep)
+
+mysleep$group2 <- mysleep$group
+head(mysleep)
+mysleep$group2 <- factor(mysleep$group2, levels = c("post", "pre"))
+summary(mysleep)
+head(mysleep)
+
+
+```
+
+# Data manipulation excursion
+## Creating (simple) new columns
+
+```{r}
+# single value
+mysleep$experiment <- 1
+summary(mysleep)
+mysleep$group3 <- mysleep$group #make a new column by assigning values to that column
+summary(mysleep)
+
+#ifelse()
+mysleep$sleeplevel <- ifelse(mysleep$extra >= 1, "high", "low") #straight if else statement
+summary(mysleep)
+
+mysleep$sleeplevel <- ifelse(mysleep$extra >= 1, "high", 
+                             ifelse(mysleep$extra < 1, "low", NA)) #nested if else statement, adding NA is helpful for complicated stateements so it'll stand out to you if something in yoru code isn't working
+summary(mysleep)
+
+mysleep$sleeplevel <- as.factor(ifelse(mysleep$extra >= 1, "high", "low"))
+summary(mysleep)
+
+mysleep$sleeplevel <- factor(ifelse(mysleep$extra >= 1, "high", "low"), levels = c("low", "high"))
+summary(mysleep)
+
+# using subsetting
+
+```
+
+## Using xtabs() to check coding/cross-tabs
+
+```{r}
+#for crosstabs, helpful for data checks after you've manipulated data
+xtabs(~ group + group2, data = mysleep) # ~ signals to R that you're doing a formula
+xtabs(~ sleeplevel + extra, data = mysleep)
+xtabs(~ extra + sleeplevel, data = mysleep) #same as above but different orientatino
+```
+
+# PRACTICE: #0 -- #6
+
+# NAs, NULLs
+
+## NAs
+  - missing data... means unknown; if age is missing the person has an age you just don't know it so you have to decide if/how to impute
+  - can be a huge pain
+  - hugely important to handle properly!
+  - no universal "handle NAs" or "ignore NAs" argument
+  - sometimes `na.rm = TRUE` (like for `mean()`)
+  - sometimes it's other stuff
+  - `cor()` use = "pairwise.complete.obs"
+  - no universal "deal with NAs" argument
+  
+```{r}
+
+```
+
+## NULL
+  - another special value
+  - means "nothing" or "doesn't exist" (contrast with "missing" or "unknown")
+
+```{r}
+
+```
+
+## Inf, -Inf, NaN
+  - can sometimes result from mathematical operations
+  - helpful to be able to identify, locate them
+
+```{r}
+x <- 1/0
+x
+
+y <- -1/0
+y
+
+z <- sqrt(-4)
+z
+
+
+```
+
+# Data types, classes, & coersion
+
+```{r}
+# typeof()
+
+# class()
+
+```
+
+`is.X` family of functions (`is.factor()`, `is.na()`, `is.finite()`, etc.)
+`as.X` family of functions (`as.factor()`, `as.numeric()`, `as.data.frame()`, etc.)
+
+# PRACTICE: #7
+
+# Lists
+  - similar to vectors
+  - can contain different data types
+  - use [[ ]] to pull out values
+  - handy for glomming large/complex objects together
+  - data frames are special lists!
+  
+```{r}
+
+```
+
+# Creating data frames
+  - handy, especially for making "look-up tables"
+  
+```{r}
+# data.frame()
+
+```
+
+# PRACTICE: #8 -- #11
+
+# Combining data frame objects
+## `rbind()` and `cbind()`
+  - rbind
+    - glues rows on top of each other
+    - expects same columns
+    - new and improved `bind_rows()` in `dplyr` package
+  - cbind
+    - glues columns next to each other
+    - need to be the same length    
+```{r}
+
+```
+
+## `merge()` and `*_join()` from `dplyr` package
+```{r}
+
+```
+    - simplest: have ONE column in common, named the same thing (with the same values)
+    - can get MUCH more complex
+    - `nrow()` good check on what was gained/lost during a merge
+    - "join" functions in `dplyr`
+      - `inner_join()` is like all = FALSE
+      - `full_join()` is like all = TRUE
+      - `left_join()`, `right_join()`, etc.
+      - see ?join for more details
+
+
+
+# PRACTICE: #12 -- #14
+
+

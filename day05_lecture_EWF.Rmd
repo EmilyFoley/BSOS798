@@ -1,0 +1,318 @@
+---
+title: "Day 5 Lecture"
+output: html_document
+---
+
+# Outline
+  - Review Practice & Homework 4
+  - Packages and namespace conflicts
+  - Review NA & NULL
+  - Lists
+  - More on data frames
+  - Simple transformations, "base" and "dplyr"
+  - Simple data combinations: binding and merging
+  - Graphics intro
+  - REMINDER: project proposals due Sunday!
+
+# Review
+
+Couple of new handy functions
+```{r}
+#seq()
+seq(from = 1, to = 10, by = 1)
+1:10
+
+seq(from = 20, to = 2, by = -2)
+seq (from = 0, to = 1, by = 0.05)
+
+#rep()
+rep(1, 10)
+rep(1:3, 5)
+rep(1:3, each = 5)
+rep(1:3, 5, each = 2)
+```
+
+# Quick aside: package namespace conflicts
+
+```{r}
+library(MASS)
+library(dplyr)
+
+# select() from MASS is "masked" because there's something of the same name in dplyr
+# need to use MASS::select()
+
+?MASS::select
+
+```
+
+# More on NA, NULL
+
+```{r}
+
+#NA = missing; NULL = does not exist
+
+x <- c(1, 2, 56, NA, 43)
+x
+mean(x) #mean is NA bc R doesn't know what the foruth number so it can't figure it out
+
+mysleep <- sleep #Now, let's simulate random missingness.,, though you wuldn't really do this in real life
+mysleep$extra[sample(1:nrow(mysleep), 5, replace = FALSE)] <- NA #grabbing 5 random values within column and replacing them with NA
+summary(mysleep)
+
+#subset data where thsoe values are missing
+#mysleep[mysleep$extra == NA, ] #this is the most intuitive way but it's wrong bc you can't know if anything is equal to NA bc NA is unknown!
+mysleep[is.na(mysleep$extra),]
+mysleep[!is.na(mysleep$extra),]
+
+?complete.cases #if you want to remove the missing data... 
+mean(mysleep$extra) #will return NA bc the mean is unknown so you wan tto remove the NAs 
+mean(mysleep$extra, na.rm = TRUE) #this woudl return the NAs removed and could produce a mean
+
+is.na(mysleep$extra) #helps you figure out where NAs are
+
+
+#read functions can help label NAs and you need to figure out how each package deals with NAs
+# read.csv(..., na.strings = c("n/a", "", " ", "NA", "N/A")) #when you pull in your data you could set things as NAs like if in survey data people entered N/A as text you want to treat that as missing
+
+#if you're getting soemthing unexpected, run code inside and work out to see where the issue is
+```
+
+
+# Lists
+  - similar to vectors but can contain different data types
+  - use [[ ]] to pull out values
+  - handy for glomming large/complex objects together
+  - data frames are special lists!
+  
+```{r}
+# list()
+x <- c(1, "two", FALSE)
+x
+
+y<- list(1, "two", FALSE)
+y
+
+y[1]
+class(y[1])
+y[[1]] #list is indicated by double brackets [[]]
+class(y[[1]])
+
+# unlist() #use if you want to change soemthing from a list to a vector
+x <- "type_instance"
+strsplit(x, split = "_")
+unlist(strsplit(x, split = "_"))
+
+# names() and str()
+x <- list(1, "two", FALSE)
+names(x) #returns NULL which means does not exist
+names(x) <- c("first", "second", "third")
+names(x)
+x
+x[[2]]
+x[["second"]]
+x["second"]
+x$second
+
+
+# pulling apart t-test object
+
+mytest <- t.test(rnorm(20, 1), rnorm(20, 2))
+mytest
+class(mytest)
+names(mytest)
+str(mytest) #str stands for structure
+
+mytest$p.value #if you just want pvalue
+mytest[["p.value"]] #if you just want pvalue but want to code it a different
+
+#S3 vs S4 classes
+#S3 = basic, flexible, when you use the str function you'll see/use $
+#S4 = fancy, more rigid definitions of classes and you can't mess them up as much but they're more compilcated to work with, when you use the str function you'll see/use @
+
+#data.frames are also just fancy lists
+nrow(mysleep) #returs 20 aka number of rows
+length(mysleep) #returns 3 aka number of colulmns
+
+mysleep$extra
+mysleep[["extra"]]
+mysleep[,"extra"]
+mysleep["extra"]
+
+```
+
+# Creating data frames
+  - handy, especially for making "look-up tables"
+  
+```{r}
+# data.frame()
+
+# stringsAsFactors argument
+
+```
+
+# Intro to `dplyr`
+
+```{r}
+
+```
+
+## subsetting with `dplyr`
+
+```{r}
+
+```
+
+## "tibbles" and `as.data.frame()`
+
+```{r}
+
+```
+
+# Simple transformations    
+
+## Creating new columns
+
+```{r}
+
+```
+
+## Simple column transformations
+
+```{r}
+
+
+```
+
+## `dplyr` style: `mutate()`
+
+```{r}
+
+```
+
+# PRACTICE
+
+# Combining data frame objects
+## `rbind()` and `cbind()`
+  - rbind
+    - glues rows on top of each other
+    - expects same columns
+    - new and improved `bind_rows()` in `dplyr` package
+  - cbind
+    - glues columns next to each other
+    - need to be the same length    
+```{r}
+
+```
+
+## `merge()` from `base` R, and `*_join()` from `dplyr` package
+```{r}
+
+```
+    - simplest: have ONE column in common, named the same thing (with the same values)
+    - can get MUCH more complex
+    - `nrow()` good check on what was gained/lost during a merge
+    - "join" functions in `dplyr`
+      - `inner_join()` is like all = FALSE
+      - `full_join()` is like all = TRUE
+      - `left_join()`, `right_join()`, etc.
+      - see ?join for more details
+
+# PRACTICE
+
+# Intro to graphics
+
+http://accidental-art.tumblr.com/
+
+## The importance of graphing
+
+```{r}
+?anscombe
+example("anscombe")
+```
+
+## Two systems
+
+  - "base" graphics
+  - "grid" graphics
+  - See *R Graphics* by Paul Murrell for a very thorough "deep-dive" into these implementations:  https://www.stat.auckland.ac.nz/~paul/RG2e/
+
+### Base graphics
+  - more "primitive"
+  - can also be much faster than grid
+  - lots of isolated plot functions
+  - lots of weird little parameters to worry about
+  - some handy quick-plot functions from base graphics:
+    - `plot()` : a generic function that will often produce something interesting, can do scatterplots with a formula `y ~ x`
+    - `hist()` : histogram of a vector
+    - `boxplot()` : boxplot, using a formula `variable ~ grouping.factor`
+
+### Grid graphics
+  - better for more "high-level" plots
+  - much more complex underlying system (IMHO)
+  - more powerful and extendable
+  - the basis of extremely popular packages such as `lattice` and `ggplot2`
+
+## Graphics in other packages
+  - many packages will have some kind of graphics functions in them, for visualizing specific kinds of things
+  - these will often be in base graphics, "pre-canned", etc.
+  - the two best more general-purpose graphics packages are `lattice` and `ggplot2`
+  - `ggplot2` is another Hadley Wickham project, and has the most documentation, examples, and is currently most widely used
+
+# Using `ggplot2`
+
+## A "Grammar of Graphics"
+  - based on work by Leland Wilkinson, a "theory" of graphic display of data
+  - Hadley implemented this framework as his dissertation
+  - `ggplot2` is the overhauled version of the original implementation, and it is still under active development
+  - the idea is to implement a general system for mapping data variables to *aesthetics* (Wilkinson's term), i.e., visual dimensions (x, y, color, etc.)
+  - allows for high-level control of the structure of a plot, to allow for flexible, powerful visualizations
+  - the place for documentation: https://ggplot2.tidyverse.org/reference/
+  - another good site: http://www.cookbook-r.com/Graphs/
+  
+## Basic structure and concepts
+
+  - unlike base graphics, the *value* of `ggplot2` objects is a complex object, and `print()`-ing them renders the graph.
+  - the value of the object is built up by adding *layers*
+  - start with a call to `ggplot()` that specifies the data and some mappings of variables to aesthetics
+  - add "geoms" to actually render something
+  - add other things for fine control over graphical parameters, etc.
+
+## Exploring data with basic geoms and aesthetics
+
+```{r}
+library(ggplot2)
+?starwars
+
+# geom_histogram()
+
+# geom_density()
+
+# geom_point()
+
+# geom_text()
+
+# geom_boxplot()
+
+```
+
+## More on colors
+  - http://colorbrewer2.org/
+
+```{r}
+colors()
+?RGB
+
+# scale_color_brewer()
+
+```
+
+### Saving plots
+
+```{r}
+?Devices
+
+```
+
+TIP: look into other PDF readers (not Adobe) if you want to leave the file "open" (i.e., displayed) on your computer while you are editing/changing the file
+
+
